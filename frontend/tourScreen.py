@@ -5,6 +5,7 @@ sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backen
 
 import streamlit as st
 import datetime
+import uuid
 
 from config import Configurator
 from tourElement import TourWidget
@@ -57,11 +58,7 @@ class TourList:
 
         # build tours
         for tour in tours:
-            uniKey = self.tourWidget.buildWidget(tour)
-
-            # Add participation optione
-            cols = st.columns(5)
-            cols[-1].button("participate", key=str(uniKey) + "participate")
+            self.tourWidget.buildWidget(tour)
 
     # create new tour
     def createTour(self):
@@ -86,6 +83,9 @@ class TourList:
 
             # Add the autor:
             tourAttr["owner"] = st.session_state["login"]["credents"]["user"]
+
+            # Add a unique Key
+            tourAttr["unique"] = uuid.uuid1()
         
             # save new tour
             cols = st.columns(5)
@@ -104,6 +104,3 @@ class TourList:
     def logoutCallback(self):
         del st.session_state["login"]
 
-    # Pariticpation callback
-    def participateCallback(self):
-        st.write("MISSING PARICIAPTE CALLBACK, NEED UNIQ KEY")
