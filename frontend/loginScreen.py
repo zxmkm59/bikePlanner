@@ -1,19 +1,17 @@
 import sys
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend/")
 
 import streamlit as st
-from firebaseConn import FirebaseConnector
 
 from config import Configurator
 
 
 class Login:
-    def __init__(self) -> None:
+    def __init__(self, base) -> None:
         self.config = Configurator()
 
-        self.base = FirebaseConnector()
+        self.base = base
 
     def loginOrRegister(self):
         # Login 
@@ -25,22 +23,23 @@ class Login:
         
     def login(self):
         if "login" not in st.session_state or st.session_state["login"]["state"] not in ["success", "register"]:
-            credents = {}
+            with st.form("login"):
+                credents = {}
 
-            # Tab1: Login Credentials 
-            credents["user"] = st.text_input("Username or Email", key="loginUser")
-            credents["password"] = st.text_input("Password", type="password", key="loginPass")
+                # Tab1: Login Credentials 
+                credents["user"] = st.text_input("Username or Email", key="loginUser")
+                credents["password"] = st.text_input("Password", type="password", key="loginPass")
 
-            # Missing ROLE 
-            credents["role"] = "guide"
+                # Missing ROLE 
+                credents["role"] = "guide"
 
-            # columns for buttons
-            cols = st.columns(3)
+                # columns for buttons
+                cols = st.columns(3)
 
-            cols[0].button("Login", on_click=self.stateCallback, args=(credents, ), key="loginBut")  # missing: roles
+                cols[0].form_submit_button("Login", on_click=self.stateCallback, args=(credents, ))  # missing: roles , key="loginBut"
 
-            # Register
-            cols[2].button("Register now", on_click=self.registerCallback, key="registerButEntry")
+                # Register
+                cols[2].form_submit_button("Register now", on_click=self.registerCallback) # , key="registerButEntry"
 
     def register(self):
 
