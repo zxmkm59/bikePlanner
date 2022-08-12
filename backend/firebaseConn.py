@@ -6,6 +6,9 @@ sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 from config import Configurator
 
+# Pricing
+# https://firebase.google.com/pricing?authuser=0&hl=de
+
 class FirebaseConnector:
     def __init__(self) -> None:
         self.config = Configurator
