@@ -94,7 +94,6 @@ class TourWidget:
             else:  # not participant
                 cols[-1].button("participate", on_click = self.participateCallback, args=(tour.copy(), ) ,key=str(uniqKey) + "participate")
 
-
     # Pariticpation callback
     def participateCallback(self, tour : dict):
 

@@ -6,6 +6,7 @@ sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backen
 import streamlit as st
 import datetime
 import uuid
+import time
 
 from config import Configurator
 from tourElement import TourWidget
@@ -64,38 +65,44 @@ class TourList:
     def createTour(self):
         # extra widget
         with st.expander("create new tour", expanded = True):
-            c = int(self.config.tour["columnSize"])
-            cols = st.columns(c)
+            with st.form(str(time.time())):
+                c = int(self.config.tour["columnSize"])
+                cols = st.columns(c)
 
-            tourAttr = {}
+                tourAttr = {}
 
-            for i, a in enumerate(self.attributes):
-                # Jump to the correct column
-                j = helpMod(i, c-1)
+                for i, a in enumerate(self.attributes):
+                    # Jump to the correct column
+                    j = helpMod(i, c-1)
 
-                # Manage different display types
-                if self.attributes[a] in ["text", "metric"]:
-                    tourAttr[a] = cols[j].text_input(a)
-                elif self.attributes[a] == "map":
-                    tourAttr[a] = cols[j].multiselect(a, options=[])  # Missing for gpx
-                elif self.attributes[a] == "date":
-                    tourAttr[a] = cols[j].date_input(a, min_value=datetime.datetime.today())
+                    # Manage different display types
+                    if self.attributes[a] in ["text", "metric"]:
+                        tourAttr[a] = cols[j].text_input(a)
+                    elif self.attributes[a] == "map":
+                        tourAttr[a] = cols[j].multiselect(a, options=[])  # Missing for gpx
+                    elif self.attributes[a] == "date":
+                        tourAttr[a] = datetime.datetime.today().timestamp()   # missing: cols[j].date_input(a, min_value=datetime.datetime.today())
+ 
+                # Add the autor:
+                tourAttr["owner"] = st.session_state["login"]["credents"]["user"]
 
-            # Add the autor:
-            tourAttr["owner"] = st.session_state["login"]["credents"]["user"]
+                # Add a unique Key
+                tourAttr["unique"] = str(uuid.uuid1())
 
-            # Add a unique Key
-            tourAttr["unique"] = uuid.uuid1()
-        
-            # save new tour
-            cols = st.columns(5)
+                # participants empty at beginning
+                tourAttr["participants"] = []
+            
+                # save new tour
+                cols = st.columns(5)
 
-            cols[0].button("Save", key = "saveNewTour", on_click=self.saveTourCallback, args=(tourAttr,))
+                cols[0].form_submit_button("Save",  on_click=self.saveTourCallback, args=(tourAttr,)) # key = "saveNewTour",
 
-            cols[-1].button("discard", key="discardNewTour", on_click=self.discardTourCallback)
+                cols[-1].form_submit_button("discard", on_click=self.discardTourCallback)  # , key="discardNewTour"
 
     def saveTourCallback(self, tourAttr : dict):
-        st.write("MISSING: FIREBASE SAVING")
+        self.base.insertNewTour(tourAttr)
+
+        st.success("New tour created")
 
     def discardTourCallback(self):
         pass

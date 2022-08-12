@@ -1,8 +1,10 @@
 import sys
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend/")
 
 import streamlit as st
+from firebaseConn import FirebaseConnector
 
 from config import Configurator
 
@@ -10,6 +12,8 @@ from config import Configurator
 class Login:
     def __init__(self) -> None:
         self.config = Configurator()
+
+        self.base = FirebaseConnector()
 
     def loginOrRegister(self):
         # Login 
@@ -50,13 +54,18 @@ class Login:
         cols = st.columns(3)
 
         # send register credentials
-        registerBut = cols[0].button("Register", on_click=self.sendRegisterCallback, key="registerButton")
+        registerBut = cols[0].button("Register", on_click=self.sendRegisterCallback, key="registerButton", args=(credentsNew, ))
 
         # back to login
         cols[-1].button("Back to Login", on_click=self.unregisterCallback, key="registerCredentsButton")
 
     # Set Login state
     def stateCallback(self, credents: dict):
+        # check if user and password is correct
+        message = self.base.loginUserCheck(credents)
+        if len(message) > 0:
+            st.error(message)
+        else:
             st.session_state["login"] = {"credents": credents, "state": "success", "role": credents["role"]}
 
     # Register Callback
@@ -70,5 +79,14 @@ class Login:
         st.session_state["login"] = {"state": "login"}
 
     # Send register callback for credentials
-    def sendRegisterCallback(self):
-        st.write("MISSING: Register")
+    def sendRegisterCallback(self, credents):
+        message = self.base.registerUser(credents)
+
+        # Print message if possible
+        if len(message) > 0:
+            st.error(message)
+        else:
+            # Back to Login
+            self.unregisterCallback()
+            st.success("Registered successfully")
+
