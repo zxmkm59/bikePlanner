@@ -1,7 +1,6 @@
 import sys
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend")
 
 import streamlit as st
 import datetime
@@ -10,7 +9,6 @@ import time
 
 from config import Configurator
 from tourElement import TourWidget
-from firebaseConn import FirebaseConnector
 
 # helper: modulo
 def helpMod(x, num):
@@ -23,15 +21,15 @@ headContainer = st.container()
 toursContainer = st.container()
 
 class TourList:
-    def __init__(self) -> None:
+    def __init__(self, base) -> None:
         self.config = Configurator()
 
-        self.tourWidget = TourWidget()
+        self.tourWidget = TourWidget(base)
 
         # All attributes of a tour with display type
         self.attributes = self.tourWidget.attributes
 
-        self.base = FirebaseConnector()
+        self.base = base
 
     # Main tour screen
     def mainTour(self):

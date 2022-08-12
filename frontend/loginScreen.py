@@ -23,7 +23,7 @@ class Login:
         
     def login(self):
         if "login" not in st.session_state or st.session_state["login"]["state"] not in ["success", "register"]:
-            with st.form("login"):
+            with st.container():
                 credents = {}
 
                 # Tab1: Login Credentials 
@@ -36,10 +36,10 @@ class Login:
                 # columns for buttons
                 cols = st.columns(3)
 
-                cols[0].form_submit_button("Login", on_click=self.stateCallback, args=(credents, ))  # missing: roles , key="loginBut"
+                cols[0].button("Login", on_click=self.stateCallback, args=(credents, ), key="loginBut")  # missing: roles 
 
                 # Register
-                cols[2].form_submit_button("Register now", on_click=self.registerCallback) # , key="registerButEntry"
+                cols[2].button("Register now", on_click=self.registerCallback, key="registerButEntry") 
 
     def register(self):
 

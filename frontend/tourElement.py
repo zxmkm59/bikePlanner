@@ -3,11 +3,8 @@ import streamlit as st
 import sys
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend")
 
 from config import Configurator
-from firebaseConn import FirebaseConnector
-
 
 # helper: modulo
 def helpMod(x, num):
@@ -16,9 +13,9 @@ def helpMod(x, num):
     return x
 
 class TourWidget:
-    def __init__(self) -> None:
+    def __init__(self, base) -> None:
         self.config = Configurator()
-        self.base = FirebaseConnector()
+        self.base = base
 
         # which keys should not showed?
         self.notAttributes = ["unique"]
@@ -58,7 +55,7 @@ class TourWidget:
         
             cols = st.columns(c)
 
-            for i, key in enumerate(tour.keys()):
+            for i, key in enumerate(sorted(list(tour.keys()))):
                 # take value
                 v = tour[key]
 
@@ -101,7 +98,7 @@ class TourWidget:
         user = st.session_state["login"]["credents"]["user"]
         tour["participants"].append(user)
 
-        self.base.updateEntry(tour)
+        self.base.insertNewTour(tour)
 
     # Un - pariticpation callback
     def unparticipateCallback(self, tour : dict):
@@ -110,4 +107,4 @@ class TourWidget:
         user = st.session_state["login"]["credents"]["user"]
         tour["participants"] = [p for p in tour["participants"] if p != user]
 
-        self.base.updateEntry(tour)
+        self.base.insertNewTour(tour)

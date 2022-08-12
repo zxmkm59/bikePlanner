@@ -1,18 +1,26 @@
 import sys
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend")
 
 import streamlit as st
 
 from config import Configurator
 from loginScreen import Login
 from tourScreen import TourList
+from firebaseConnSync import FirebaseConnector
+
 
 class MainScreen:
     def __init__(self) -> None:
         self.config = Configurator()
-        self.login = Login()
-        self.tour = TourList()
+
+        # Create Firebase Connection
+        self.base = FirebaseConnector()
+
+        # Other instances which use firebase Connector
+        self.login = Login(self.base)
+        self.tour = TourList(self.base)
 
     # Create Main Page
     def mainPage(self):
@@ -26,14 +34,13 @@ class MainScreen:
             # Show and create tours
             self.tour.mainTour()
 
-    
-
-
-
-if __name__ == "__main__":
-    
+def main():
     m = MainScreen()
 
     m.mainPage()
+
+if __name__ == "__main__":
+    main()
+    
 
     # streamlit run c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/frontend/mainScreen.py
