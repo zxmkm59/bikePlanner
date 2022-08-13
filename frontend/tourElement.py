@@ -27,7 +27,6 @@ class TourWidget:
                            "elevation": "metric",
                            "velocity": "metric",
                            "climbs" : "metric",
-                           "gpx": "map"
                         } 
         # units of attributes
         self.units = {"title": "", 
@@ -35,8 +34,7 @@ class TourWidget:
                       "distance": "km",
                       "velocity": "km/h",
                       "elevation": "hm",
-                      "climbs": "",
-                      "gpx": ""}
+                      "climbs": ""}
 
     # build tour widget
     def buildWidget(self, tour):
