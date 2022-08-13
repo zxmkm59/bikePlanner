@@ -40,7 +40,12 @@ class GpxViewer:
         return ds
 
     # plot a gpx in dataframe format
-    def showGpx(self, df: pd.DataFrame):
+    def showGpx(self, df: pd.DataFrame or dict):
+
+        # Convert if necessary
+        if isinstance(df, dict):
+            df = pd.DataFrame.from_dict(df)
+
         # 1. Show Geo
         st.map(df)
 
@@ -49,16 +54,10 @@ class GpxViewer:
         st.plotly_chart(fig, use_container_width=True, sharing ="streamlit")
 
     # create a elevation chart
-    def elevationChart(self, df: pd.DataFrame or dict):
-        # Opt 1: pandas Dataframe
-        if isinstance(df, pd.DataFrame):
-            x=df["distance"].values.tolist()
-            y=df["elevation"].values.tolist()
-            s=df["slope"].values.tolist()
-        else:  # dict 
-            x=df["distance"]
-            y=df["elevation"]
-            s=df["slope"]
+    def elevationChart(self, df: pd.DataFrame):
+        x=df["distance"].values.tolist()
+        y=df["elevation"].values.tolist()
+        s=df["slope"].values.tolist()
 
         fig = go.Figure(data=[go.Scatter(x=x, 
                                         y=y,

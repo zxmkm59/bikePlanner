@@ -13,7 +13,7 @@ from gpxReader import GpxViewer
 
 # helper: modulo
 def helpMod(x, num):
-    while x > num:
+    while x >= num:
         x -= num
     return x
 
@@ -71,13 +71,19 @@ class TourList:
             self.tourWidget.buildWidget(tour)
 
     # create new tour
-    def createTour(self):
+    def createTourOld(self):
         # Set state for reopening create tour widget
         st.session_state["ShowCreateTourWidget"] = True
 
         # extra widget
         with st.expander("create new tour", expanded = True):
                 with st.container():
+
+                    # Header: date, time, startplace
+                    # Second: Participants 
+                    # Third: Meta Data 
+                    # 4: GPX
+
                     c = int(self.config.tour["columnSize"])
                     cols = st.columns(c)
 
@@ -111,6 +117,60 @@ class TourList:
                     cols[0].button("Save",  on_click=self.saveTourCallback, args=(tourAttr,)) # key = "saveNewTour",
 
                     cols[-1].button("discard", on_click=self.discardTourCallback)  # , key="discardNewTour"
+
+        # create new tour
+    def createTour(self):
+        # Set state for reopening create tour widget
+        st.session_state["ShowCreateTourWidget"] = True
+
+        # extra widget
+        with st.expander("create new tour", expanded = True):
+                with st.container():
+                    tourAttr = {}
+
+                    # Title: title
+                    # Header: date, time, startplace
+                    # Second: Meta Data 
+                    # 4: GPX
+
+                    c = int(self.config.tour["columnSize"])
+
+                    # Title
+                    tourAttr["title"] = st.text_input("Title")
+
+                    # Header
+                    headCols = st.columns(3)
+                    date = headCols[0].date_input("start date", min_value=datetime.datetime.today())
+                    time_of_date = headCols[1].time_input("start time")
+                    tourAttr["date"] = datetime.datetime.combine(date, time_of_date).timestamp()
+
+                    tourAttr["startplace"] = headCols[2].text_input(label="start place")
+
+                    # Second 
+                    cols2 = st.columns(3)
+                    for i, at in enumerate(sorted(self.attributes)):
+                        j = helpMod(i, 3)
+                        tourAttr[at] = cols2[j].text_input(label=at)
+
+                    # Add Gpx import and viewer
+                    tourAttr["gpx"] = self.gpx.addGpx()
+
+                    # Add unique key
+                    tourAttr["unique"] = str(uuid.uuid1())
+
+                    # Add the autor:
+                    tourAttr["owner"] = st.session_state["login"]["credents"]["user"]
+
+                    # participants empty at beginning
+                    tourAttr["participants"] = []
+                
+                    # save new tour
+                    cols = st.columns(5)
+
+                    cols[0].button("Save",  on_click=self.saveTourCallback, args=(tourAttr,)) # key = "saveNewTour",
+
+                    cols[-1].button("discard", on_click=self.discardTourCallback)  # , key="discardNewTour"
+
 
     def saveTourCallback(self, tourAttr : dict):
         self.base.insertNewTour(tourAttr)
