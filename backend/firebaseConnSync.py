@@ -1,4 +1,6 @@
+import datetime
 import sys
+import traceback
 import firebase_admin
 from firebase_admin import firestore
 import streamlit as st
@@ -10,6 +12,9 @@ from config import Configurator
 
 # Pricing
 # https://firebase.google.com/pricing?authuser=0&hl=de
+
+# HOW TO USE: 
+# https://towardsdatascience.com/nosql-on-the-cloud-with-python-55a1383752fc
 
 class FirebaseConnector:
     def __init__(self) -> None:
@@ -46,6 +51,11 @@ class FirebaseConnector:
     def writer(self, collection, key:str, data:dict):
         collection.document(key).set(data)
 
+    # delete a sepcific tour
+    def deleteTour(self, key):
+        collection = self.db.collection("Tours")
+        collection.document(key).delete()
+
     # Tour Management 
     # ------------------------------------------------------------------------------------
 
@@ -65,12 +75,16 @@ class FirebaseConnector:
     # load all known tours
     def loadTours(self):
         
+        # check for old tours
+        self.checkStarttime()
+
+        # load all actual tours
         collection = self.db.collection("Tours")
 
         tours = self.readerCollection(collection)
 
         return tours
-    
+
     # create new tour 
     def insertNewTour(self, tour):
         # key as document key
@@ -80,6 +94,20 @@ class FirebaseConnector:
 
         # Insert new tour
         self.writer(collection, key, tour)
+
+    # Check if the starttime is yesterday. Then delete tours
+    def checkStarttime(self):
+        try:
+            collection = self.db.collection("Tours")
+            dtYest = (datetime.datetime.today() - datetime.timedelta(days=1)).timestamp()
+            qs = collection.where("date", "<=", dtYest).get()
+
+            print(f"Es sind {len(qs)} Touren abgelaufen und werden gelösscht")
+
+            deleteKeys = [q["unique"] for q in qs]
+            [self.deleteTour(key) for key in deleteKeys]
+        except:
+            print(traceback.print_exc())
 
     # ------------------------------------------------------------------------------------
 
