@@ -1,8 +1,4 @@
-import email
-from email import message
 import sys
-import uuid
-import datetime
 import asyncio
 from google.cloud.firestore import AsyncClient 
 from google.oauth2 import service_account   
@@ -31,16 +27,8 @@ class FirebaseConnector:
         connected = False
 
         while not connected:
-            try:
-                # Synchron:
-                """                cred_obj = firebase_admin.credentials.Certificate("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/Certificates/firebaseCredents.json")
-
-                default_app = firebase_admin.initialize_app(cred_obj)
-
-                # this connects to Firestore database
-                self.db = firestore.client() """ 
-                
-                with open('./Certificates/firebaseCredents.json') as json_file:
+            try:               
+                with open('firebaseCredents.json') as json_file:
                     json_data = json.load(json_file)
 
                 self.db = AsyncClient(

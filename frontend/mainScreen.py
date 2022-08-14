@@ -1,7 +1,8 @@
 import sys
 
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend")
+sys.path.append("/app/backend")
 
 import streamlit as st
 
@@ -9,7 +10,6 @@ from config import Configurator
 from loginScreen import Login
 from tourScreen import TourList
 from firebaseConnSync import FirebaseConnector
-
 
 class MainScreen:
     def __init__(self) -> None:

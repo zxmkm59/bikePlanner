@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 import plotly.graph_objects as go
 
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 from config import Configurator
 
@@ -20,8 +20,6 @@ class GpxViewer:
 
         # Input new gpx file
         file = st.file_uploader("Upload", type =["gpx"], accept_multiple_files=False)
-
-        print("GPX FILE IS  NONE: ", file is None)
 
         if file is not None:
             gpx = gpxpy.parse(file)

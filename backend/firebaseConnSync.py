@@ -23,7 +23,7 @@ class FirebaseConnector:
         try:
             firebase_admin.get_app()
         except:
-            cred_obj = firebase_admin.credentials.Certificate("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/Certificates/firebaseCredents.json")
+            cred_obj = firebase_admin.credentials.Certificate("./Certificates/firebaseCredents.json")
             default_app = firebase_admin.initialize_app(cred_obj)
 
         # this connects to Firestore database

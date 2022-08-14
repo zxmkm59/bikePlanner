@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 import streamlit as st
 
@@ -34,12 +34,12 @@ class Login:
                 credents["role"] = "guide"
 
                 # columns for buttons
-                cols = st.columns(3)
+                cols = st.columns([0.3, 1, 0.3])
 
                 cols[0].button("Login", on_click=self.stateCallback, args=(credents, ), key="loginBut")  # missing: roles 
 
                 # Register
-                cols[2].button("Register now", on_click=self.registerCallback, key="registerButEntry") 
+                cols[-1].button("Register now", on_click=self.registerCallback, key="registerButEntry") 
 
     def register(self):
 

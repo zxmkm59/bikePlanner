@@ -1,9 +1,9 @@
-from datetime import datetime
-import time
+import datetime
+import uuid
 import streamlit as st
 import sys
 
-sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
+#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 from config import Configurator
 from gpxReader import GpxViewer
@@ -36,63 +36,10 @@ class TourWidget:
                       "climbs": ""}
 
     # build tour widget
-    def buildWidgetOld(self, tour):
-
-        # Size for columns in grid
-        c = int(self.config.tour["columnSize"])
-
-        # build a title from the date and custom title name
-        title = f"{tour['date']} | {tour['title']}"
-
-        # unique Key of this tour
-        uniqKey = tour["unique"]
-
-        # widget
-        with st.expander(title, expanded = False):
-        
-            cols = st.columns(c)
-
-            for i, key in enumerate(sorted(list(tour.keys()))):
-                # take value
-                v = tour[key]
-
-                # Jump to the correct column
-                j = helpMod(i, c-1)
-
-                # Manage different display types
-
-                # 1. From owner input
-                if key in self.attributes:
-                    # Add a unit
-                    v = f"{v} {self.units[key]}"
-
-                    if self.attributes[key] == "text":
-                        cols[j].text(f"{key}: {v}")
-                    elif self.attributes[key] == "metric":
-                        cols[j].metric(label=key, value=v)
-                    elif self.attributes[key] == "date":
-                        cols[j].text(f"{key}: {v}")
-
-                # dont show key
-                elif key in self.notAttributes:   
-                    continue
-                # Not from owner attributes
-                else:
-                    cols[j].text(f"{key}: {v}")
-
-            # Add participation option
-            cols = st.columns(5)
-            owner = st.session_state["login"]["credents"]["user"]
-            if owner in tour["participants"]:  # already participant
-                cols[-1].button("unparticipate", on_click = self.unparticipateCallback, args=(tour.copy(), ), key=str(uniqKey) + "unparticipate")
-            else:  # not participant
-                cols[-1].button("participate", on_click = self.participateCallback, args=(tour.copy(), ) ,key=str(uniqKey) + "participate")
-
-    # build tour widget
-    def buildWidget(self, tour):
+    def tourWidget(self, tour):
 
         # starttime of the tour
-        date = datetime.fromtimestamp(tour['date'])
+        date = datetime.datetime.fromtimestamp(tour['date'])
 
         # build a title from the date and custom title name
         title = f"{date} | {tour['title']}"
@@ -100,11 +47,6 @@ class TourWidget:
         # widget
         with st.expander(title, expanded = False):
             
-            # Header: date, time, startplace
-            # Second: Participants 
-            # Third: Meta Data 
-            # 4: GPX
-
             # Header 
             headCols = st.columns(2)
             headCols[0].metric(label="Starttime", value=str(date))
@@ -112,8 +54,7 @@ class TourWidget:
             st.write("---")
 
             # Second
-            self.addCaption(f"Participants")
-            self.addCaption(f"total: {len(tour['participants'])}")
+            self.addCaption(f"Participants ({len(tour['participants'])})")
             cols2_1 = st.columns(3)
             for i, p in enumerate(tour["participants"]):
                 j  = helpMod(i, 3)
@@ -143,10 +84,49 @@ class TourWidget:
 
                 self.gpx.showGpx(gpxData)
 
+    # build widget for new tour creation
+    def createWidget(self):
+        with st.container():
+            tourAttr = {}
+
+            # Title
+            tourAttr["title"] = st.text_input("Title")
+
+            # Header
+            headCols = st.columns(3)
+            date = headCols[0].date_input("start date", min_value=datetime.datetime.today())
+            time_of_date = headCols[1].time_input("start time")
+            tourAttr["date"] = datetime.datetime.combine(date, time_of_date).timestamp()
+
+            tourAttr["startplace"] = headCols[2].text_input(label="start place")
+
+            # Second 
+            cols2 = st.columns(3)
+            for i, at in enumerate(sorted(self.attributes)):
+                j = helpMod(i, 3)
+                tourAttr[at] = cols2[j].text_input(label=at)
+
+            # Add Gpx import and viewer
+            gpxCols = st.columns([1,4,1])
+            with gpxCols[1]:
+                tourAttr["gpx"] = self.gpx.addGpx()
+
+            # Add unique key
+            tourAttr["unique"] = str(uuid.uuid1())
+
+            # Add the autor:
+            tourAttr["owner"] = st.session_state["login"]["credents"]["user"]
+
+            # participants empty at beginning
+            tourAttr["participants"] = []
+    
+        return tourAttr
+
+
     # Add a caption statement
     def addCaption(self, txt: str):
-        colsCaption = st.columns(10)
-        colsCaption[5].caption(txt)
+        colsCaption = st.columns([1,0.5,1])
+        colsCaption[1].caption(txt)
 
     # Add participate option
     def participate(self, tour):
@@ -157,7 +137,6 @@ class TourWidget:
             cols[-1].button("unparticipate", on_click = self.unparticipateCallback, args=(tour.copy(), ), key=str(tour["unique"]) + "unparticipate")
         else:  # not participant
             cols[-1].button("participate", on_click = self.participateCallback, args=(tour.copy(), ) ,key=str(tour["unique"]) + "participate")
-
 
     # Pariticpation callback
     def participateCallback(self, tour : dict):
