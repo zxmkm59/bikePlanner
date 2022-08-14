@@ -42,15 +42,16 @@ class TourWidget:
         date = datetime.datetime.fromtimestamp(tour['date'])
 
         # build a title from the date and custom title name
-        title = f"{date} | {tour['title']}"
+        title = f"{date} | {tour['title']} | {tour['owner']}"
 
         # widget
         with st.expander(title, expanded = False):
             
             # Header 
-            headCols = st.columns(2)
+            headCols = st.columns(3)
             headCols[0].metric(label="Starttime", value=str(date))
-            headCols[1].metric(label="Startplace", value=tour["startplace"]), 
+            headCols[1].metric(label="Startplace", value=tour["startplace"]) 
+            headCols[2].metric(label="Guide", value=tour["owner"]) 
             st.write("---")
 
             # Second
@@ -83,6 +84,8 @@ class TourWidget:
                 gpxData = tour["gpx"]
 
                 self.gpx.showGpx(gpxData)
+
+            # The 
 
     # build widget for new tour creation
     def createWidget(self):
