@@ -120,7 +120,9 @@ class TourWidget:
             # initials
             tourAttr = {}  # collect tour attributes
             tempGpx = {}  # collect gpx calculated attributes
-
+            
+            # Organisation Attributes 
+            # ------------------------------------------------------------------------
             # Title
             tourAttr["title"] = st.text_input("Title")
 
@@ -135,7 +137,10 @@ class TourWidget:
 
             tourAttr["startplace"] = headCols[2].text_input(label="start place")
             st.write("---")
+            # ------------------------------------------------------------------------
 
+            # GPX
+            # ------------------------------------------------------------------------
             # Add Gpx import and viewer
             gpxCols = st.columns([1,4,1])
             with gpxCols[1]:
@@ -145,7 +150,10 @@ class TourWidget:
                 if len(tourAttr["gpx"])> 0 :
                     tempGpx = self.gpx.calcFromGpx(tourAttr["gpx"])
             st.write("---")
+            # ------------------------------------------------------------------------
 
+            # Hard Facts
+            # ------------------------------------------------------------------------
             # Write hard facts (or reuse from gpx data befor) 
             cols2 = st.columns(3)
             for i, at in enumerate(sorted(self.attributes)):
@@ -158,11 +166,14 @@ class TourWidget:
                 label = f"{at} [{self.units[at]}]"
 
                 tourAttr[at] = cols2[j].text_input(label=label, value = value)
+            # ------------------------------------------------------------------------
 
-            # Write comments 
+            # Comments 
+            # ------------------------------------------------------------------------
             st.write("---")
             tourAttr["comments"] = st.text_area(label="Comments")
-
+            # ------------------------------------------------------------------------
+            
             # Add unique key
             tourAttr["unique"] = str(uuid.uuid1())
 

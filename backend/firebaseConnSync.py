@@ -3,6 +3,7 @@ import sys
 import traceback
 import firebase_admin
 from firebase_admin import firestore
+import streamlit as st
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
@@ -100,6 +101,12 @@ class FirebaseConnector:
 
     # Check if the starttime is yesterday. Then delete tours
     def checkStarttime(self):
+        # increase performance
+        # dont check if already checked in the last time
+        if "lastStarttimeCheck" in st.session_state and \
+            datetime.datetime.today().timestamp() - st.session_state["lastStarttimeCheck"] < int(self.config.firebase_connection["tourMaxAge"])/5:
+            return
+
         try:
             collection = self.db.collection("Tours")
 
@@ -115,6 +122,9 @@ class FirebaseConnector:
             # deletion
             deleteKeys = [q["unique"] for q in qs]
             [self.deleteTour(key) for key in deleteKeys]
+
+            # set last check date 
+            st.session_state["lastStarttimeCheck"] = datetime.datetime.today().timestamp()
         except:
             print(traceback.print_exc())
 
@@ -141,17 +151,22 @@ class FirebaseConnector:
     def userQueryLogin(self, credents: dict):
         # User collection
         collection = self.db.collection("Users")
-        
-        # check user name and password
-        qs = collection.where("user", "==", credents["user"]).where("password", "==", credents["password"]).get()
+
+        # check if there is a email or a username inserted
+        if "@" in credents["user"]:
+            # check email and password
+            qs = collection.where("email", "==", credents["user"]).where("password", "==", credents["password"]).get()
+        else:
+            # check user name and password
+            qs = collection.where("user", "==", credents["user"]).where("password", "==", credents["password"]).get()
 
         ds = [q.to_dict() for q in qs]
 
         # Returning: Error message and user role if possible
-        if len(ds) >0:
-            return "", ds[0]["role"]
+        if len(ds) > 0:
+            return "", ds[0]
         else:
-            return "User is unknown", ""
+            return "User is unknown", {}
 
     # register a new User
     def registerUser(self, credents: dict) -> str:

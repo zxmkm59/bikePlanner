@@ -10,6 +10,9 @@ from loginScreen import Login
 from tourScreen import TourList
 from firebaseConnSync import FirebaseConnector
 
+
+
+
 class MainScreen:
     def __init__(self) -> None:
         self.config = Configurator()
@@ -32,6 +35,9 @@ class MainScreen:
             
             # Show and create tours
             self.tour.mainTour()
+
+        # Github stars
+        st.write("[![Star](<https://img.shields.io/github/stars/zxmkm59/bikePlanner.svg?logo=github&style=social>)](<https://gitHub.com/zxmkm59/bikePlanner>)")
 
 def main():
     m = MainScreen()

@@ -64,11 +64,12 @@ class Login:
     # Set login state if credentials are correct
     def stateCallback(self, credents: dict):
         # check if user and password is correct
-        message, role = self.base.loginUserCheck(credents)
+        # updates the credents with correct user name 
+        message, credents = self.base.loginUserCheck(credents)
         if len(message) > 0:
             st.error(message)
         else:
-            st.session_state["login"] = {"credents": credents, "state": "success", "role": role}
+            st.session_state["login"] = {"credents": credents, "state": "success", "role": credents["role"]}
 
     # Register callback
     def registerCallback(self):

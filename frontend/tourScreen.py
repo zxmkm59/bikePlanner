@@ -56,6 +56,11 @@ class TourList:
         with tabs[3]:
             pass
 
+        # Refresh and logout for each tab
+        cols = st.columns([0.05, 1, 0.05])
+        cols[0].button("Refresh", key="refreshButton")
+        cols[-1].button("Logout", key="logoutButton", on_click=self.logoutCallback)
+
     # Head line
     def headLine(self):
         # Head line Columns for ordering
@@ -69,9 +74,6 @@ class TourList:
         if "ShowCreateTourWidget" in st.session_state and st.session_state["ShowCreateTourWidget"]:
             self.createTour()
         
-        # Logout
-        cols[-1].button("Logout", key="logoutButton", on_click=self.logoutCallback)
-
     # Callback if a new tour is in creation mode
     def setCreateStateCallback(self):
          # Set state for reopening create tour widget
