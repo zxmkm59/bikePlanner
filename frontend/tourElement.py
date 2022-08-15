@@ -1,10 +1,6 @@
 import datetime
-from re import L
 import uuid
 import streamlit as st
-import sys
-
-#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 from config import Configurator
 from gpxReader import GpxViewer
@@ -17,6 +13,7 @@ def helpMod(x, num):
 
 class TourWidget:
     def __init__(self, base) -> None:
+        # Other instances
         self.config = Configurator()
         self.base = base
         self.gpx = GpxViewer()
@@ -49,6 +46,7 @@ class TourWidget:
         with st.expander(title, expanded = False):
             
             # Organisation Attributes 
+            # ------------------------------------------------------------------------
             self.addCaption("Organisation")
             headCols = st.columns(3)
 
@@ -61,8 +59,10 @@ class TourWidget:
             headCols[2].write(tour["owner"])
 
             st.write("---")
+            # ------------------------------------------------------------------------
 
             # Participants
+            # ------------------------------------------------------------------------
             self.addCaption(f"Participants ({len(tour['participants'])})")
             cols2_1 = st.columns(3)
             for i, p in enumerate(tour["participants"]):
@@ -72,25 +72,32 @@ class TourWidget:
 
             # add participate option
             self.participate(tour, typ)
+            st.write("---")
+        
+            # ------------------------------------------------------------------------
 
             # Sum overall
-            st.write("---")
+            # ------------------------------------------------------------------------
             self.addCaption("The hard facts")
             cols3 = st.columns(3)
             for i, at in enumerate(self.units):
                 j = helpMod(i, 3)
                 cols3[j].metric(label=at, value= f"{tour[at]} {self.units[at]}")
             st.write("---")
+            # ------------------------------------------------------------------------
 
             #  GPX Data
+            # ------------------------------------------------------------------------
             self.addCaption("GPX")
             gpxCols = st.columns([1,4,1])
             with gpxCols[1]:
                 gpxData = tour["gpx"]
 
                 self.gpx.showGpx(gpxData)
+            # ------------------------------------------------------------------------
 
             # Editing
+            # ------------------------------------------------------------------------
             if st.session_state["login"]["credents"]["user"] == tour["owner"]:
                 st.write("---")
                 self.addCaption("Editing")
@@ -166,6 +173,7 @@ class TourWidget:
         if tour["owner"] == user:
             return
 
+        # Check if is already a participant
         if user in tour["participants"]:  # already participant
             cols[-1].button("unparticipate", on_click = self.unparticipateCallback, args=(tour.copy(), ), key=str(tour["unique"]) + "unparticipate" + typ)
         else:  # not participant
@@ -178,6 +186,7 @@ class TourWidget:
         user = st.session_state["login"]["credents"]["user"]
         tour["participants"].append(user)
 
+        # Create a new tour with more participants
         self.base.insertNewTour(tour)
 
     # Un - pariticpation callback
@@ -187,12 +196,13 @@ class TourWidget:
         user = st.session_state["login"]["credents"]["user"]
         tour["participants"] = [p for p in tour["participants"] if p != user]
 
+        # Create a new tour with less participants
         self.base.insertNewTour(tour)
 
     # Delete tour as owner callback
     def deleteCallback(self, tour):
         self.base.deleteTour(tour["unique"])
 
-    # Vicinity 
+    # TODO: Vicinity 
     def vicinity(self):
         pass
