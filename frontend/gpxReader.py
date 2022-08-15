@@ -2,10 +2,7 @@ import numpy as np
 import gpxpy 
 import streamlit as st
 import pandas as pd
-import sys
 import plotly.graph_objects as go
-
-#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
 from config import Configurator
 
@@ -44,19 +41,21 @@ class GpxViewer:
         if isinstance(df, dict):
             df = pd.DataFrame.from_dict(df)
 
-        # 1. Show Geo
+        # 1. Show geo map 
         st.map(df)
 
-        # 2. Show elevation
+        # 2. Show elevation chart
         fig = self.elevationChart(df)
         st.plotly_chart(fig, use_container_width=True, sharing ="streamlit")
 
     # create a elevation chart
-    def elevationChart(self, df: pd.DataFrame):
+    def elevationChart(self, df: pd.DataFrame) -> go.Figure:
+        # convert to list for figure
         x=df["distance"].values.tolist()
         y=df["elevation"].values.tolist()
         s=df["slope"].values.tolist()
 
+        # create go chart
         fig = go.Figure(data=[go.Scatter(x=x, 
                                         y=y,
                                         text=s,
@@ -69,7 +68,7 @@ class GpxViewer:
                             ]
                             )
                         
-
+        # Some layout specials
         fig.update_layout(
                 #hovermode='x unified',
                 title="Elevation profile",
@@ -82,6 +81,7 @@ class GpxViewer:
                 )
             )
 
+        # Set x axe angle for ticks
         fig.update_xaxes(
             tickangle = 90)
 
@@ -89,17 +89,25 @@ class GpxViewer:
 
     # parse a gpx with one track to a dataframe
     def parseGpx(self, gpx) -> pd.DataFrame:
+        # Extract gpx data
         track=gpx.tracks[0]
-
         segment = track.segments[0]
 
-        distances = []  # distances acc.
+        # intital: collect values
+        distances = []  # distances accumlated
         spaces = []     # only spaces between points 
+
+        # Calculate between points
         p0 =  segment.points[0]
         for p in segment.points:
             d0 = distances[-1] if len(distances) > 0 else 0
-            distances.append(d0 + p0.distance_2d(p))
+
+            # Space between following points
             spaces.append(p0.distance_2d(p))
+
+            # Accumulated distance to this point
+            distances.append(d0 + p0.distance_2d(p))
+
             p0 = p
 
         # calculate in km
@@ -109,11 +117,22 @@ class GpxViewer:
         slope = [0] + list(np.diff([point.elevation for point in segment.points]))
         slope = [s/(d)*100 if d > 0 else 0 for s, d in zip(slope, spaces)]
 
+        # prepare for Dataframe
         data = [[point.longitude, point.latitude, point.elevation, dist, sl] for point, dist, sl in zip(segment.points, distances, slope)]
 
         cols = ["longitude", "latitude", "elevation", "distance", "slope"]
 
         return pd.DataFrame(data, columns=cols)
+
+    # Calculate hard facts from gpx data
+    def calcFromGpx(self, gpxData: dict):
+
+        gpxFacts = {"distance": int(gpxData["distance"][-1]),
+                    "elevation": int(sum([n for n in np.diff(gpxData["elevation"]) if n > 0]))  # sum up all positive changes of elevation
+                    }
+        return gpxFacts
+
+
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 import sys
 
-#sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/backend")
 sys.path.append("/app/backend")
 
@@ -25,10 +24,10 @@ class MainScreen:
     # Create Main Page
     def mainPage(self):
         
-        # Tab 1: Login or Register
+        # Login or Register
         self.login.loginOrRegister()
 
-        # If logged in succesfull:
+        # If logged in succesfully:
         if "login" in st.session_state and st.session_state["login"]["state"] == "success":
             
             # Show and create tours

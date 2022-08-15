@@ -96,6 +96,16 @@ class TourWidget:
                 self.gpx.showGpx(gpxData)
             # ------------------------------------------------------------------------
 
+            # Comments if comments inserted by the owner
+            # ------------------------------------------------------------------------
+            if len(tour["comments"]) > 0:
+                st.write("---")
+                self.addCaption("Comments")
+
+                st.write(tour["comments"])
+            # ------------------------------------------------------------------------
+
+
             # Editing
             # ------------------------------------------------------------------------
             if st.session_state["login"]["credents"]["user"] == tour["owner"]:
@@ -124,6 +134,7 @@ class TourWidget:
             tourAttr["date"] = datetime.datetime.combine(date, time_of_date).timestamp()
 
             tourAttr["startplace"] = headCols[2].text_input(label="start place")
+            st.write("---")
 
             # Add Gpx import and viewer
             gpxCols = st.columns([1,4,1])
@@ -133,6 +144,7 @@ class TourWidget:
                 # Calculate some hard facts from gpx data
                 if len(tourAttr["gpx"])> 0 :
                     tempGpx = self.gpx.calcFromGpx(tourAttr["gpx"])
+            st.write("---")
 
             # Write hard facts (or reuse from gpx data befor) 
             cols2 = st.columns(3)
@@ -146,6 +158,10 @@ class TourWidget:
                 label = f"{at} [{self.units[at]}]"
 
                 tourAttr[at] = cols2[j].text_input(label=label, value = value)
+
+            # Write comments 
+            st.write("---")
+            tourAttr["comments"] = st.text_area(label="Comments")
 
             # Add unique key
             tourAttr["unique"] = str(uuid.uuid1())

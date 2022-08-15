@@ -1,11 +1,8 @@
 # firebase Connection
-firebase_connection = {"certFile": "firebaseCredents.json"}
-
-
-# Tour Screen
-tour = {"columnSize": 3}
+firebase_connection = {"certFile": "firebaseCredents.json",
+                       "tourMaxAge": 60*60*24  # maximum age of tours in seconds
+                    }
 
 class Configurator:
     def __init__(self) -> None:
-        self.tour = tour
-        self.firebase_connection =firebase_connection
+        self.firebase_connection = firebase_connection

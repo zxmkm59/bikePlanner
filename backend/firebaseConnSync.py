@@ -3,8 +3,6 @@ import sys
 import traceback
 import firebase_admin
 from firebase_admin import firestore
-import streamlit as st
-import time
 
 sys.path.append("c:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/")
 
@@ -18,8 +16,10 @@ from config import Configurator
 
 class FirebaseConnector:
     def __init__(self) -> None:
-        self.config = Configurator
+        # load configurations
+        self.config = Configurator()
 
+        # Create the connection to firebase
         self.createConnection()
 
     # create connection to firebase
@@ -67,13 +67,14 @@ class FirebaseConnector:
          # key as document key
         key = tour["unique"]
 
+        # the tour collection
         collection = self.db.collection("Tours")
 
         # Insert new tour
         self.writer(collection, key, tour)
 
     # load all known tours
-    def loadTours(self):
+    def loadTours(self) -> list:
         
         # check for old tours
         self.checkStarttime()
@@ -81,15 +82,17 @@ class FirebaseConnector:
         # load all actual tours
         collection = self.db.collection("Tours")
 
+        # tour collection
         tours = self.readerCollection(collection)
 
         return tours
 
     # create new tour 
-    def insertNewTour(self, tour):
+    def insertNewTour(self, tour:dict):
         # key as document key
         key = tour["unique"]
 
+        # tour collection
         collection = self.db.collection("Tours")
 
         # Insert new tour
@@ -99,11 +102,17 @@ class FirebaseConnector:
     def checkStarttime(self):
         try:
             collection = self.db.collection("Tours")
-            dtYest = (datetime.datetime.today() - datetime.timedelta(days=1)).timestamp()
+
+            # maximum age of tours
+            dtYest = (datetime.datetime.today() - datetime.timedelta(seconds = int(self.config.firebase_connection["tourMaxAge"]))).timestamp()
             qs = collection.where("date", "<=", dtYest).get()
 
-            print(f"Es sind {len(qs)} Touren abgelaufen und werden gelösscht")
+            # convert to dicts
+            qs = [q.to_dict() for q in qs]
 
+            print(f"Es sind {len(qs)} Touren abgelaufen und werden gelöscht")
+
+            # deletion
             deleteKeys = [q["unique"] for q in qs]
             [self.deleteTour(key) for key in deleteKeys]
         except:
@@ -116,10 +125,12 @@ class FirebaseConnector:
     # ------------------------------------------------------------------------------------
 
     # User Query for register
+    # check one key, value pair in the db
     def userQueryRegister(self, equalDict: dict):
         # User collection
         collection = self.db.collection("Users")
 
+        # equalDict has only one key
         key = list(equalDict.keys())[0]
 
         qs = collection.where(key, "==", str(equalDict[key])).get()
@@ -136,13 +147,14 @@ class FirebaseConnector:
 
         ds = [q.to_dict() for q in qs]
 
+        # Returning: Error message and user role if possible
         if len(ds) >0:
-            return ""
+            return "", ds[0]["role"]
         else:
-            return "User is unknown"
+            return "User is unknown", ""
 
     # register a new User
-    def registerUser(self, credents):
+    def registerUser(self, credents: dict) -> str:
 
         # Check if user is already known
         users = self.userQueryRegister({"user": credents["user"]})
@@ -165,6 +177,7 @@ class FirebaseConnector:
             # User collection
             collection = self.db.collection("Users")
 
+            # create new user in db
             self.writer(collection, credents["user"], credents)
         return message
 

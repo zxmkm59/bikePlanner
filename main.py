@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("C:/Users/tobia/OneDrive/Desktop/Programming/cyclePlanner/frontend/")
-sys.path.append("app/frontend")
+sys.path.append("/app/frontend")
 
 from mainScreen import MainScreen
 
