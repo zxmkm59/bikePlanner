@@ -8,11 +8,11 @@ from mainScreen import MainScreen
 
 # Initial set parameters for the side
 if "pageConfigSetted" not in st.session_state:
-    st.set_page_config(
+    """    st.set_page_config(
         page_title="Bike planer",
         page_icon="🧊",
         layout="wide"
-    )
+    )"""
     st.session_state["pageConfigSetted"] = True
 
 
