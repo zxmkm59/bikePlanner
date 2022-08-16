@@ -31,7 +31,7 @@ class TourWidget:
         self.units = {"distance": "km",
                       "velocity": "km/h",
                       "elevation": "hm",
-                      "climbs": ""}
+                      "climbs": "count"}
 
     # build tour widget
     def tourWidget(self, tour:dict, typ:str):
@@ -64,9 +64,11 @@ class TourWidget:
             # Participants
             # ------------------------------------------------------------------------
             self.addCaption(f"Participants ({len(tour['participants'])})")
-            cols2_1 = st.columns(3)
+            colNum = min(len(tour['participants']), 8) 
+            cols2_1 = st.columns([0.05 if colNum > 0 else 1 for i in range(colNum)] + [1])
+            
             for i, p in enumerate(tour["participants"]):
-                j  = helpMod(i, 3)
+                j  = helpMod(i, colNum)
                 #cols2_1[j].write(p)
                 cols2_1[j].button(label=p, key=f"{p}_{tour['unique']}_{typ}", disabled=True)
 
@@ -124,7 +126,9 @@ class TourWidget:
             # Organisation Attributes 
             # ------------------------------------------------------------------------
             # Title
-            tourAttr["title"] = st.text_input("Title")
+            # Placeholder to overwrite if gpx is uploaded
+            titlePlace = st.empty()
+            tourAttr["title"] = titlePlace.text_input("Title", key="titleUserInput")
 
             # default title if no title inserted
             tourAttr["title"] = "no title" if len(tourAttr["title"]) == 0 else tourAttr["title"]
@@ -144,7 +148,10 @@ class TourWidget:
             # Add Gpx import and viewer
             gpxCols = st.columns([1,4,1])
             with gpxCols[1]:
-                tourAttr["gpx"] = self.gpx.addGpx()
+                tourAttr["gpx"], title = self.gpx.addGpx()
+
+                # overwrite title with gpx name
+                tourAttr["title"] = titlePlace.text_input("Title", value=title, key="titleGpxInput")
 
                 # Calculate some hard facts from gpx data
                 if len(tourAttr["gpx"])> 0 :
@@ -159,7 +166,7 @@ class TourWidget:
             for i, at in enumerate(sorted(self.attributes)):
                 j = helpMod(i, 3)
 
-                # if theres a value from inserting gpx data ?
+                # is there a value from inserting gpx data ?
                 value = tempGpx[at] if at in tempGpx else ""
 
                 # the label contains the name and unit

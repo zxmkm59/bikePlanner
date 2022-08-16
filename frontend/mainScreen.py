@@ -11,8 +11,6 @@ from tourScreen import TourList
 from firebaseConnSync import FirebaseConnector
 
 
-
-
 class MainScreen:
     def __init__(self) -> None:
         self.config = Configurator()

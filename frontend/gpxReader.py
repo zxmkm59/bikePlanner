@@ -14,12 +14,15 @@ class GpxViewer:
     def addGpx(self):
         # initial for output format
         ds = {}
+        fileName = ""
 
         # Input new gpx file
         file = st.file_uploader("Upload", type =["gpx"], accept_multiple_files=False)
 
         if file is not None:
             gpx = gpxpy.parse(file)
+            
+            fileName = file.name.replace(".gpx", "")
 
             # convert to dataframe
             df = self.parseGpx(gpx)
@@ -29,10 +32,11 @@ class GpxViewer:
 
             # convert to databse datatype
             ds = df.to_dict('series')
+
             # convert to list from np.arrays
             ds = {k:list(ds[k]) for k in ds}
 
-        return ds
+        return ds, fileName
 
     # plot a gpx in dataframe format
     def showGpx(self, df: pd.DataFrame or dict):
@@ -128,7 +132,9 @@ class GpxViewer:
     def calcFromGpx(self, gpxData: dict):
 
         gpxFacts = {"distance": int(gpxData["distance"][-1]),
-                    "elevation": int(sum([n for n in np.diff(gpxData["elevation"]) if n > 0]))  # sum up all positive changes of elevation
+                    "elevation": int(sum([n for n in np.diff(gpxData["elevation"]) if n > 0])),  # sum up all positive changes of elevation,
+                    "startLat": gpxData["latitude"][0],
+                    "startLong": gpxData["longitude"][0],
                     }
         return gpxFacts
 

@@ -154,8 +154,12 @@ class FirebaseConnector:
 
         # check if there is a email or a username inserted
         if "@" in credents["user"]:
+            
+            # emails have no empty spaces and are not key sensitive
+            emailAdress = credents["user"].replace(" ", "").lower()
+
             # check email and password
-            qs = collection.where("email", "==", credents["user"]).where("password", "==", credents["password"]).get()
+            qs = collection.where("email", "==", emailAdress).where("password", "==", credents["password"]).get()
         else:
             # check user name and password
             qs = collection.where("user", "==", credents["user"]).where("password", "==", credents["password"]).get()
