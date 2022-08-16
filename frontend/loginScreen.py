@@ -53,7 +53,7 @@ class Login:
         credentsNew["role"] = "guide" if roleGuide else "member"
 
         # following buttons
-        cols = st.columns(3)
+        cols = st.columns([0.15, 1, 0.15])
 
         # send register credentials
         cols[0].button("Register", on_click=self.sendRegisterCallback, key="registerButton", args=(credentsNew, ))

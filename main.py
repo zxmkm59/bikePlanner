@@ -7,13 +7,14 @@ sys.path.append("/app/frontend")
 from mainScreen import MainScreen
 
 # Initial set parameters for the side
-if "pageConfigSetted" not in st.session_state:
+try:
         st.set_page_config(
             page_title="Bike planer",
             page_icon="bike.png",
             layout="wide"
         )
-        st.session_state["pageConfigSetted"] = True
+except:
+    pass
 
 if __name__ == "__main__":
     m = MainScreen()
